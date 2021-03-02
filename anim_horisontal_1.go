@@ -15,20 +15,26 @@ const (
 
 type Animator1 struct {
 	// anim base point
-	pt image.Point
-
-	//kind animKindType
-
+	pt              image.Point
 	curFrameAnimDir animDirType
-	curXDelta       float64
+	moveXDelta      float64
+
+	curXDelta float64
+	accel     float64
+}
+
+func NewAnimator1(basePos image.Point, moveXDelta float64) *Animator1 {
+	return &Animator1{
+		pt:              basePos,
+		curFrameAnimDir: normal,
+		moveXDelta:      moveXDelta,
+		accel:           moveXDelta / 60 * 40,
+	}
 }
 
 func (s *Animator1) NextFrame() {
-	const moveDeltaX = 10
 
-	var accel float64 = float64(moveDeltaX) / 60 * 40
-
-	if math.Abs(s.curXDelta) >= moveDeltaX {
+	if math.Abs(s.curXDelta) >= s.moveXDelta {
 		switch s.curFrameAnimDir {
 		case normal:
 			s.curFrameAnimDir = reverse
@@ -39,9 +45,9 @@ func (s *Animator1) NextFrame() {
 
 	switch s.curFrameAnimDir {
 	case normal:
-		s.curXDelta += accel
+		s.curXDelta += s.accel
 	case reverse:
-		s.curXDelta -= accel
+		s.curXDelta -= s.accel
 	}
 }
 

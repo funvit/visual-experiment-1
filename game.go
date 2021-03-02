@@ -124,11 +124,7 @@ func New(w, h int) *Game {
 				Y: y,
 			},
 		}
-
-		b.Anim = &Animator1{
-			pt:              *b.Pt,
-			curFrameAnimDir: normal,
-		}
+		b.Anim = NewAnimator1(*b.Pt, 8*rand.Float64()+2)
 
 		g.boxes = append(g.boxes, b)
 	}
