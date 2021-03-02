@@ -86,7 +86,7 @@ func (g *Game) Run() error {
 
 func (g *Game) loop(ctx context.Context) {
 	logInfo.Println("game loop started")
-	t := time.NewTicker(1 * time.Second / 20)
+	t := time.NewTicker(1 * time.Second / 60)
 
 	for {
 		select {
@@ -126,9 +126,8 @@ func New(w, h int) *Game {
 		}
 
 		b.Anim = &Animator1{
-			pt:                *b.Pt,
-			curFrameAnimDir:   normal,
-			curFrameEntityPos: image.Point{},
+			pt:              *b.Pt,
+			curFrameAnimDir: normal,
 		}
 
 		g.boxes = append(g.boxes, b)

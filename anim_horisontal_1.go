@@ -19,14 +19,16 @@ type Animator1 struct {
 
 	//kind animKindType
 
-	curFrameAnimDir   animDirType
-	curFrameEntityPos image.Point
+	curFrameAnimDir animDirType
+	curXDelta       float64
 }
 
 func (s *Animator1) NextFrame() {
 	const moveDeltaX = 10
 
-	if math.Abs(float64(s.curFrameEntityPos.X)) >= moveDeltaX {
+	var accel float64 = float64(moveDeltaX) / 60 * 40
+
+	if math.Abs(s.curXDelta) >= moveDeltaX {
 		switch s.curFrameAnimDir {
 		case normal:
 			s.curFrameAnimDir = reverse
@@ -37,12 +39,12 @@ func (s *Animator1) NextFrame() {
 
 	switch s.curFrameAnimDir {
 	case normal:
-		s.curFrameEntityPos.X++
+		s.curXDelta += accel
 	case reverse:
-		s.curFrameEntityPos.X--
+		s.curXDelta -= accel
 	}
 }
 
 func (s *Animator1) Apply(op *ebiten.DrawImageOptions) {
-	op.GeoM.Translate(float64(s.curFrameEntityPos.X), float64(s.curFrameEntityPos.Y))
+	op.GeoM.Translate(s.curXDelta, 0)
 }
