@@ -34,7 +34,7 @@ type Game struct {
 type EBox1 struct {
 	Pt *image.Point
 
-	Anim *Animator1
+	Anim *HAnimator1
 }
 
 func init() {
@@ -124,7 +124,7 @@ func New(w, h int) *Game {
 				Y: y,
 			},
 		}
-		b.Anim = NewAnimator1(*b.Pt, 8*rand.Float64()+2)
+		b.Anim = NewHAnimator1(*b.Pt, 8*rand.Float64()+2)
 
 		g.boxes = append(g.boxes, b)
 	}

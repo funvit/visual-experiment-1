@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	screenW = flag.Int("width", 540, "window width")
+	screenW = flag.Int("width", 600, "window width")
 	screenH = flag.Int("height", 600, "window height")
 )
 

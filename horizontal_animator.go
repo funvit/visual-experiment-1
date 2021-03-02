@@ -13,7 +13,7 @@ const (
 	reverse
 )
 
-type Animator1 struct {
+type HAnimator1 struct {
 	// anim base point
 	pt              image.Point
 	curFrameAnimDir animDirType
@@ -23,8 +23,8 @@ type Animator1 struct {
 	accel     float64
 }
 
-func NewAnimator1(basePos image.Point, moveXDelta float64) *Animator1 {
-	return &Animator1{
+func NewHAnimator1(basePos image.Point, moveXDelta float64) *HAnimator1 {
+	return &HAnimator1{
 		pt:              basePos,
 		curFrameAnimDir: normal,
 		moveXDelta:      moveXDelta,
@@ -32,7 +32,7 @@ func NewAnimator1(basePos image.Point, moveXDelta float64) *Animator1 {
 	}
 }
 
-func (s *Animator1) NextFrame() {
+func (s *HAnimator1) NextFrame() {
 
 	if math.Abs(s.curXDelta) >= s.moveXDelta {
 		switch s.curFrameAnimDir {
@@ -51,6 +51,6 @@ func (s *Animator1) NextFrame() {
 	}
 }
 
-func (s *Animator1) Apply(op *ebiten.DrawImageOptions) {
+func (s *HAnimator1) Apply(op *ebiten.DrawImageOptions) {
 	op.GeoM.Translate(s.curXDelta, 0)
 }
