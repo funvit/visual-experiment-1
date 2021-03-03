@@ -33,13 +33,14 @@ type Game struct {
 
 	boxes []*EBox1
 
-	tmpImg *ebiten.Image
+	//tmpImg    *ebiten.Image
+	debugMode bool
 }
 
 // EBox1 = entity box 1
 type EBox1 struct {
-	Pt *image.Point
-
+	Pt   *image.Point
+	img  *ebiten.Image
 	Anim *CircleAnimator1
 }
 
@@ -52,7 +53,6 @@ func (g *Game) Layout(int, int) (int, int) {
 }
 
 func (g *Game) Update() error {
-
 	// play animation
 	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
 		if g.gameLoopCancel != nil {
@@ -63,13 +63,15 @@ func (g *Game) Update() error {
 			go g.loop(g.gameLoopCtx)
 		}
 	}
-
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) || ebiten.IsKeyPressed(ebiten.KeyRight) {
 		if g.gameLoopCancel != nil {
 			g.gameLoopCancel()
 			g.gameLoopCancel = nil
 		}
 		g.loopOneFrame()
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		g.debugMode = !g.debugMode
 	}
 
 	return nil
@@ -81,8 +83,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		b := g.boxes[i]
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(float64(b.Pt.X), float64(b.Pt.Y))
-
 		b.Anim.Apply(op)
+
 		//ebitenutil.DebugPrintAt(
 		//	screen,
 		//	fmt.Sprintf(
@@ -95,7 +97,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		//	b.Pt.Y,
 		//)
 
-		screen.DrawImage(g.tmpImg, op)
+		screen.DrawImage(b.img, op)
 	}
 
 	// must be last
@@ -142,6 +144,9 @@ func (g *Game) loopOneFrame() {
 }
 
 func (g *Game) drawDebug(screen *ebiten.Image) {
+	if !g.debugMode {
+		return
+	}
 	ebitenutil.DebugPrintAt(
 		screen,
 		fmt.Sprintf("Loop frame: %d", g.loopFrame),
@@ -153,10 +158,7 @@ func (g *Game) drawDebug(screen *ebiten.Image) {
 func New(w, h int) *Game {
 	g := &Game{
 		window: NewBox(image.Pt(0, 0), w, h),
-		tmpImg: ebiten.NewImage(16, 16),
 	}
-
-	g.tmpImg.Fill(color.White)
 
 	g.boxes = make([]*EBox1, 0, maxBoxes)
 	for i := 0; i < maxBoxes; i++ {
@@ -164,15 +166,22 @@ func New(w, h int) *Game {
 		y := 40 + rand.Intn(g.window.Bounds().Max.Y-16-40)
 
 		b := &EBox1{
+			img: ebiten.NewImage(16, 16),
 			Pt: &image.Point{
 				X: x,
 				Y: y,
 			},
 		}
+		b.img.Fill(color.RGBA{
+			R: uint8(rand.Int31n(0xff/3*2)) + 0xff/3,
+			G: uint8(rand.Int31n(0xff/3*2)) + 0xff/3,
+			B: uint8(rand.Int31n(0xff/3*2)) + 0xff/3,
+			A: 0xff,
+		})
 		b.Anim = NewCircleAnimator1(
 			*b.Pt,
 			28,
-			rand.Intn(loopFps)+10,
+			rand.Intn(loopFps*4)+loopFps,
 		)
 
 		g.boxes = append(g.boxes, b)
