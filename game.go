@@ -20,7 +20,7 @@ var (
 )
 
 const (
-	maxBoxes = 1 //100
+	maxBoxes = 100
 	loopFps  = 60
 )
 
@@ -83,17 +83,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		op.GeoM.Translate(float64(b.Pt.X), float64(b.Pt.Y))
 
 		b.Anim.Apply(op)
-		ebitenutil.DebugPrintAt(
-			screen,
-			fmt.Sprintf(
-				"Angle: %f, Path pos: x=%f, y=%f",
-				b.Anim.curAngle,
-				b.Anim.x,
-				b.Anim.y,
-			),
-			b.Pt.X,
-			b.Pt.Y,
-		)
+		//ebitenutil.DebugPrintAt(
+		//	screen,
+		//	fmt.Sprintf(
+		//		"Angle: %f, Path pos: x=%f, y=%f",
+		//		b.Anim.curAngle,
+		//		b.Anim.x,
+		//		b.Anim.y,
+		//	),
+		//	b.Pt.X,
+		//	b.Pt.Y,
+		//)
 
 		screen.DrawImage(g.tmpImg, op)
 	}
@@ -169,7 +169,11 @@ func New(w, h int) *Game {
 				Y: y,
 			},
 		}
-		b.Anim = NewCircleAnimator1(*b.Pt, 28, loopFps*1.0)
+		b.Anim = NewCircleAnimator1(
+			*b.Pt,
+			28,
+			rand.Intn(loopFps)+10,
+		)
 
 		g.boxes = append(g.boxes, b)
 	}
