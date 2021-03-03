@@ -44,8 +44,8 @@ func (s *CircleAnimator1) NextFrame() {
 }
 
 func (s *CircleAnimator1) calcCirclePathPos(angle, radius float64) (x, y float64) {
-	x = math.Cos(s.curAngle*math.Pi/180) * s.radius
-	y = -math.Sin(s.curAngle*math.Pi/180) * s.radius
+	x = math.Cos(angle*math.Pi/180) * radius
+	y = -math.Sin(angle*math.Pi/180) * radius
 	return x, y
 }
 
