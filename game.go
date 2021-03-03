@@ -96,8 +96,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for i := range g.boxes {
 		b := g.boxes[i]
 		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(b.Pt.X), float64(b.Pt.Y))
 		b.Anim.Apply(op)
+		op.GeoM.Translate(float64(b.Pt.X), float64(b.Pt.Y))
 
 		//ebitenutil.DebugPrintAt(
 		//	screen,

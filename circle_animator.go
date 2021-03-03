@@ -60,18 +60,11 @@ func (s *CircleAnimator1) calcCirclePathPos(angle, radius float64) (x, y float64
 }
 
 func (s *CircleAnimator1) Apply(op *ebiten.DrawImageOptions) {
-	op.GeoM.Translate(s.x, s.y)
-
 	if s.boost > 0 {
-		//op.GeoM.Translate(8, 8)
-		op.GeoM.Scale(float64(s.boost)/100, float64(s.boost)/100)
-		//op.GeoM.Translate(-8, -8)
-
-		op.ColorM.Translate(
-			float64(s.boost)/100.0,
-			float64(s.boost)/100.0,
-			float64(s.boost)/100.0,
-			1,
-		)
+		op.GeoM.Translate(-8, -8)
+		op.GeoM.Scale(float64(s.boost)/100+1, float64(s.boost)/100+1)
+		op.GeoM.Translate(8, 8)
 	}
+
+	op.GeoM.Translate(s.x, s.y)
 }
