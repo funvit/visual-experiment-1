@@ -4,6 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"image"
 	"math"
+	"sync/atomic"
 )
 
 const circleAnimatorMaxAngle = 360.0
@@ -17,6 +18,11 @@ type CircleAnimator1 struct {
 	speed          float64
 	x, y           float64
 	deltaX, deltaY float64
+	boost          int32
+}
+
+func (s *CircleAnimator1) SetBoost(v int32) {
+	atomic.StoreInt32(&s.boost, v)
 }
 
 func NewCircleAnimator1(basePos image.Point, radius float64, animDurFrames int) *CircleAnimator1 {
@@ -41,6 +47,10 @@ func (s *CircleAnimator1) NextFrame() {
 	s.x, s.y = s.calcCirclePathPos(s.curAngle, s.radius)
 	s.x -= s.deltaX
 	s.y -= s.deltaY
+
+	if s.boost > 0 {
+		s.boost -= 10
+	}
 }
 
 func (s *CircleAnimator1) calcCirclePathPos(angle, radius float64) (x, y float64) {
@@ -51,4 +61,17 @@ func (s *CircleAnimator1) calcCirclePathPos(angle, radius float64) (x, y float64
 
 func (s *CircleAnimator1) Apply(op *ebiten.DrawImageOptions) {
 	op.GeoM.Translate(s.x, s.y)
+
+	if s.boost > 0 {
+		//op.GeoM.Translate(8, 8)
+		op.GeoM.Scale(float64(s.boost)/100, float64(s.boost)/100)
+		//op.GeoM.Translate(-8, -8)
+
+		op.ColorM.Translate(
+			float64(s.boost)/100.0,
+			float64(s.boost)/100.0,
+			float64(s.boost)/100.0,
+			1,
+		)
+	}
 }

@@ -11,6 +11,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"sync/atomic"
 	"time"
 )
 
@@ -20,7 +21,7 @@ var (
 )
 
 const (
-	maxBoxes = 100
+	maxBoxes = 10 //100
 	loopFps  = 60
 )
 
@@ -35,6 +36,9 @@ type Game struct {
 
 	//tmpImg    *ebiten.Image
 	debugMode bool
+
+	beatRate  int32
+	beatRateC chan int32
 }
 
 // EBox1 = entity box 1
@@ -72,6 +76,16 @@ func (g *Game) Update() error {
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		g.debugMode = !g.debugMode
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		if atomic.LoadInt32(&g.beatRate) < 300 {
+			atomic.AddInt32(&g.beatRate, 1)
+		}
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyDown) {
+		if atomic.LoadInt32(&g.beatRate) > 0 {
+			atomic.AddInt32(&g.beatRate, -1)
+		}
 	}
 
 	return nil
@@ -137,8 +151,20 @@ func (g *Game) loopOneFrame() {
 		g.loopFrame = 1
 	}
 
+	var boost int32
+	select {
+	case v := <-g.beatRateC:
+		boost = v
+	default:
+	}
+
 	for i := range g.boxes {
 		b := g.boxes[i]
+
+		if boost > 0 {
+			b.Anim.SetBoost(boost)
+		}
+
 		b.Anim.NextFrame()
 	}
 }
@@ -153,11 +179,19 @@ func (g *Game) drawDebug(screen *ebiten.Image) {
 		0,
 		0,
 	)
+	ebitenutil.DebugPrintAt(
+		screen,
+		fmt.Sprintf("Beat rate: %d", atomic.LoadInt32(&g.beatRate)),
+		0,
+		14,
+	)
 }
 
 func New(w, h int) *Game {
 	g := &Game{
-		window: NewBox(image.Pt(0, 0), w, h),
+		window:    NewBox(image.Pt(0, 0), w, h),
+		beatRate:  30,
+		beatRateC: make(chan int32),
 	}
 
 	g.boxes = make([]*EBox1, 0, maxBoxes)
@@ -186,6 +220,15 @@ func New(w, h int) *Game {
 
 		g.boxes = append(g.boxes, b)
 	}
+
+	go func() {
+		for {
+			select {
+			case <-time.Tick(10_000 * time.Millisecond / time.Duration(g.beatRate)):
+				g.beatRateC <- 100
+			}
+		}
+	}()
 
 	return g
 }
