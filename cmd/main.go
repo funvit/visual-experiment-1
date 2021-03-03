@@ -12,7 +12,7 @@ var (
 )
 
 func main() {
-	fmt.Println("Audio sequencer beta")
+	fmt.Println("Visual experiment 1 beta")
 	flag.Parse()
 
 	g := visual1.New(*screenW, *screenH)

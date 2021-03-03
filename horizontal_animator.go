@@ -23,12 +23,12 @@ type HAnimator1 struct {
 	accel     float64
 }
 
-func NewHAnimator1(basePos image.Point, moveXDelta float64) *HAnimator1 {
+func NewHAnimator1(basePos image.Point, maxDeltaX float64) *HAnimator1 {
 	return &HAnimator1{
 		pt:              basePos,
 		curFrameAnimDir: normal,
-		moveXDelta:      moveXDelta,
-		accel:           moveXDelta / 60 * 40,
+		moveXDelta:      maxDeltaX,
+		accel:           maxDeltaX / 60 * 40, // fixme: magic numbers
 	}
 }
 

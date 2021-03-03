@@ -2,7 +2,9 @@ package visual1
 
 import (
 	"context"
+	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"golang.org/x/exp/rand"
 	"image"
@@ -17,11 +19,15 @@ var (
 	logErr  = log.New(os.Stdout, "ERROR ", log.LstdFlags|log.Lshortfile)
 )
 
-const maxBoxes = 100
+const (
+	maxBoxes = 1 //100
+	loopFps  = 60
+)
 
 type Game struct {
 	window *Box
 
+	loopFrame      int
 	gameLoopCtx    context.Context
 	gameLoopCancel context.CancelFunc
 
@@ -34,7 +40,7 @@ type Game struct {
 type EBox1 struct {
 	Pt *image.Point
 
-	Anim *HAnimator1
+	Anim *CircleAnimator1
 }
 
 func init() {
@@ -58,6 +64,14 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeyF) || ebiten.IsKeyPressed(ebiten.KeyRight) {
+		if g.gameLoopCancel != nil {
+			g.gameLoopCancel()
+			g.gameLoopCancel = nil
+		}
+		g.loopOneFrame()
+	}
+
 	return nil
 }
 
@@ -69,9 +83,23 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		op.GeoM.Translate(float64(b.Pt.X), float64(b.Pt.Y))
 
 		b.Anim.Apply(op)
+		ebitenutil.DebugPrintAt(
+			screen,
+			fmt.Sprintf(
+				"Angle: %f, Path pos: x=%f, y=%f",
+				b.Anim.curAngle,
+				b.Anim.x,
+				b.Anim.y,
+			),
+			b.Pt.X,
+			b.Pt.Y,
+		)
 
 		screen.DrawImage(g.tmpImg, op)
 	}
+
+	// must be last
+	g.drawDebug(screen)
 }
 
 func (g *Game) Run() error {
@@ -86,7 +114,7 @@ func (g *Game) Run() error {
 
 func (g *Game) loop(ctx context.Context) {
 	logInfo.Println("game loop started")
-	t := time.NewTicker(1 * time.Second / 60)
+	t := time.NewTicker(1 * time.Second / loopFps)
 
 	for {
 		select {
@@ -96,13 +124,30 @@ func (g *Game) loop(ctx context.Context) {
 			return
 
 		case <-t.C:
-
-			for i := range g.boxes {
-				b := g.boxes[i]
-				b.Anim.NextFrame()
-			}
+			g.loopOneFrame()
 		}
 	}
+}
+
+func (g *Game) loopOneFrame() {
+	g.loopFrame++
+	if g.loopFrame > loopFps {
+		g.loopFrame = 1
+	}
+
+	for i := range g.boxes {
+		b := g.boxes[i]
+		b.Anim.NextFrame()
+	}
+}
+
+func (g *Game) drawDebug(screen *ebiten.Image) {
+	ebitenutil.DebugPrintAt(
+		screen,
+		fmt.Sprintf("Loop frame: %d", g.loopFrame),
+		0,
+		0,
+	)
 }
 
 func New(w, h int) *Game {
@@ -115,8 +160,8 @@ func New(w, h int) *Game {
 
 	g.boxes = make([]*EBox1, 0, maxBoxes)
 	for i := 0; i < maxBoxes; i++ {
-		x := rand.Intn(g.window.Bounds().Max.X - 16)
-		y := rand.Intn(g.window.Bounds().Max.Y - 16)
+		x := 40 + rand.Intn(g.window.Bounds().Max.X-16-40)
+		y := 40 + rand.Intn(g.window.Bounds().Max.Y-16-40)
 
 		b := &EBox1{
 			Pt: &image.Point{
@@ -124,7 +169,7 @@ func New(w, h int) *Game {
 				Y: y,
 			},
 		}
-		b.Anim = NewHAnimator1(*b.Pt, 8*rand.Float64()+2)
+		b.Anim = NewCircleAnimator1(*b.Pt, 28, loopFps*1.0)
 
 		g.boxes = append(g.boxes, b)
 	}
