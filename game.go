@@ -21,7 +21,7 @@ var (
 )
 
 const (
-	maxBoxes = 10 //100
+	maxBoxes = 40 //100
 	loopFps  = 60
 )
 
@@ -109,6 +109,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		//	),
 		//	b.Pt.X,
 		//	b.Pt.Y,
+		//)
+
+		//ebitenutil.DrawLine(
+		//	screen,
+		//	float64(b.Pt.X),
+		//	float64(b.Pt.Y),
+		//	op.GeoM.Element(0, 2),
+		//	op.GeoM.Element(1, 2),
+		//	color.White,
 		//)
 
 		screen.DrawImage(b.img, op)
@@ -214,7 +223,7 @@ func New(w, h int) *Game {
 		})
 		b.Anim = NewCircleAnimator1(
 			*b.Pt,
-			28,
+			20+rand.Float64()+20,
 			rand.Intn(loopFps*4)+loopFps,
 		)
 
