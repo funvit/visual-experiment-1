@@ -99,27 +99,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		b.Anim.Apply(op)
 		op.GeoM.Translate(float64(b.Pt.X), float64(b.Pt.Y))
 
-		//ebitenutil.DebugPrintAt(
-		//	screen,
-		//	fmt.Sprintf(
-		//		"Angle: %f, Path pos: x=%f, y=%f",
-		//		b.Anim.curAngle,
-		//		b.Anim.x,
-		//		b.Anim.y,
-		//	),
-		//	b.Pt.X,
-		//	b.Pt.Y,
-		//)
-
-		//ebitenutil.DrawLine(
-		//	screen,
-		//	float64(b.Pt.X),
-		//	float64(b.Pt.Y),
-		//	op.GeoM.Element(0, 2),
-		//	op.GeoM.Element(1, 2),
-		//	color.White,
-		//)
-
 		screen.DrawImage(b.img, op)
 	}
 
