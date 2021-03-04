@@ -1,5 +1,17 @@
 # Visual experiment No 1
 
-## TODO:
-- [ ] animation loop. реализовать анимацию примитива за счет кода,
-  а не за счет анимации спрайта.
+Just testing some visual art :-)
+
+Colored boxes flying in circles.
+
+## Keys
+
+- `P` - play / pause
+- `D` - debug
+- `F` - forward by one frame
+- `<Left>` - fast forward
+- `<Up>`, `<Down>` - inc or dec beat rate
+
+## Example
+
+![](doc/screen-record.gif)
